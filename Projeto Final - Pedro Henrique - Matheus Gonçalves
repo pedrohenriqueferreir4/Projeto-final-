@@ -1,0 +1,278 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+class Funcionario {
+    private String nome;
+    private int horasTrabalhadas;
+    private double valorPorHora;
+    private double despesaAdicional;
+
+    public Funcionario(String nome, int horasTrabalhadas, double valorPorHora, double despesaAdicional) {
+        this.nome = nome;
+        this.horasTrabalhadas = horasTrabalhadas;
+        this.valorPorHora = valorPorHora;
+        this.despesaAdicional = despesaAdicional;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public double calcularPagamento() {
+        if (despesaAdicional > 0) {
+            return (horasTrabalhadas * valorPorHora) + (despesaAdicional * 1.1);
+        } else {
+            return horasTrabalhadas * valorPorHora;
+        }
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        List<Funcionario> funcionarios = new ArrayList<>();
+
+        System.out.print("Digite o número de funcionários: ");
+        int n = sc.nextInt();
+
+        for (int i = 0; i < n; i++) {
+            System.out.println("Funcionário #" + (i + 1));
+            System.out.print("Nome: ");
+            String nome = sc.next();
+            System.out.print("Horas trabalhadas: ");
+            int horasTrabalhadas = sc.nextInt();
+            System.out.print("Valor por hora: ");
+            double valorPorHora = sc.nextDouble();
+            System.out.print("Despesa adicional (0 se não for terceirizado): ");
+            double despesaAdicional = sc.nextDouble();
+
+            Funcionario funcionario = new Funcionario(nome, horasTrabalhadas, valorPorHora, despesaAdicional);
+            funcionarios.add(funcionario);
+        }
+
+        System.out.println("\nPagamentos:");
+        for (Funcionario funcionario : funcionarios) {
+            System.out.println(funcionario.getNome() + ": R$ " + funcionario.calcularPagamento());
+        }
+    }
+}
+
+
+
+
+
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        
+        System.out.println("Digite o número do contrato: ");
+        int numeroContrato = sc.nextInt();
+        
+        System.out.println("Digite a data do contrato (dd/MM/yyyy): ");
+        String dataContratoStr = sc.next();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        Date dataContrato = null;
+        try {
+            dataContrato = sdf.parse(dataContratoStr);
+        } catch (Exception e) {
+            System.out.println("Data inválida. Encerrando o programa.");
+            System.exit(0);
+        }
+        
+        System.out.println("Digite o valor total do contrato: ");
+        double valorTotal = sc.nextDouble();
+        
+        System.out.println("Digite o número de meses para parcelamento do contrato: ");
+        int numMeses = sc.nextInt();
+        
+        Date dataParcela = new Date(dataContrato.getTime());
+        
+        for (int i = 1; i <= numMeses; i++) {
+            dataParcela.setMonth(dataParcela.getMonth() + 1);
+            double valorParcela = valorTotal / numMeses;
+            System.out.println("Parcela " + i + ":");
+            System.out.println("Data de vencimento: " + sdf.format(dataParcela));
+            System.out.println("Valor da parcela: " + valorParcela);
+        }
+        
+        sc.close();
+    }
+}
+
+
+
+
+
+
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+public class Main {
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        List<Produto> produtos = new ArrayList<>();
+
+        System.out.print("Digite o número de produtos: ");
+        int n = sc.nextInt();
+
+        for (int i = 0; i < n; i++) {
+            System.out.println("Produto #" + (i + 1) + " dados:");
+            System.out.print("Comum, usado ou importado (c/u/i)? ");
+            char tipo = sc.next().charAt(0);
+            sc.nextLine(); // Limpar o buffer
+
+            System.out.print("Nome: ");
+            String nome = sc.nextLine();
+
+            System.out.print("Preço: ");
+            double preco = sc.nextDouble();
+
+            if (tipo == 'i') {
+                System.out.print("Taxa alfandegária: ");
+                double taxaAlfandega = sc.nextDouble();
+                produtos.add(new ProdutoImportado(nome, preco, taxaAlfandega));
+            } else if (tipo == 'u') {
+                System.out.print("Data de fabricação (DD/MM/YYYY): ");
+                String dataFabricacao = sc.next();
+                produtos.add(new ProdutoUsado(nome, preco, dataFabricacao));
+            } else {
+                produtos.add(new Produto(nome, preco));
+            }
+        }
+
+        System.out.println("\nEtiquetas de preço:");
+        for (Produto produto : produtos) {
+            System.out.println(produto.etiquetaPreco());
+        }
+
+        sc.close();
+    }
+}
+
+class Produto {
+    private String nome;
+    private double preco;
+
+    public Produto(String nome, double preco) {
+        this.nome = nome;
+        this.preco = preco;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public double getPreco() {
+        return preco;
+    }
+
+    public void setPreco(double preco) {
+        this.preco = preco;
+    }
+
+    public String etiquetaPreco() {
+        return nome + " $ " + String.format("%.2f", preco);
+    }
+}
+
+class ProdutoImportado extends Produto {
+    private double taxaAlfandega;
+
+    public ProdutoImportado(String nome, double preco, double taxaAlfandega) {
+        super(nome, preco);
+        this.taxaAlfandega = taxaAlfandega;
+    }
+
+    @Override
+    public String etiquetaPreco() {
+        return getNome() + " $ " + String.format("%.2f", getPreco() + taxaAlfandega) + " (Taxa alfandegária: $ " + String.format("%.2f", taxaAlfandega) + ")";
+    }
+}
+
+class ProdutoUsado extends Produto {
+    private String dataFabricacao;
+
+    public ProdutoUsado(String nome, double preco, String dataFabricacao) {
+        super(nome, preco);
+        this.dataFabricacao = dataFabricacao;
+    }
+
+    @Override
+    public String etiquetaPreco() {
+        return getNome() + " (usado) $ " + String.format("%.2f", getPreco()) + " (Data de fabricação: " + dataFabricacao + ")";
+    }
+}
+
+
+
+
+
+
+import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.println("Digite o modelo do carro: ");
+        String modeloCarro = sc.nextLine();
+
+        System.out.println("Digite o valor por hora da locação: ");
+        double valorPorHora = sc.nextDouble();
+
+        System.out.println("Digite o valor diário da locação: ");
+        double valorDiario = sc.nextDouble();
+
+        System.out.println("Digite o instante inicial da locação (em horas): ");
+        int instanteInicial = sc.nextInt();
+
+        System.out.println("Digite o instante final da locação (em horas): ");
+        int instanteFinal = sc.nextInt();
+
+        int duracao = instanteFinal - instanteInicial;
+
+        double valorLocacao = 0.0;
+
+        if (duracao <= 12) {
+            valorLocacao = duracao * valorPorHora;
+        } else {
+            valorLocacao = valorDiario;
+        }
+
+        double valorImposto = 0.0;
+        if (valorLocacao <= 100.00) {
+            valorImposto = valorLocacao * 0.20;
+        } else {
+            valorImposto = valorLocacao * 0.15;
+        }
+
+        double valorTotal = valorLocacao + valorImposto;
+
+        System.out.println("Nota de Pagamento");
+        System.out.println("Modelo do carro: " + modeloCarro);
+        System.out.println("Valor da locação: R$ " + String.format("%.2f", valorLocacao));
+        System.out.println("Valor do imposto: R$ " + String.format("%.2f", valorImposto));
+        System.out.println("Valor total do pagamento: R$ " + String.format("%.2f", valorTotal));
+
+        sc.close();
+    }
+}
+
+
+
+
